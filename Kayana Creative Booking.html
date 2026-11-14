@@ -1,0 +1,436 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Kayana Creative Booking</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: satu kolom, langkah booking berurutan (paket, tanggal, jam, data), ringkasan dan tombol aksi di akhir */
+:root{
+  --bg:#F2F4F1; --surface:#FFFFFF; --fg:#1E2B27; --muted:#5E6B66; --line:#D9DFDA;
+  --accent:#A8405C; --accent-fg:#FFFFFF; --accent-soft:#F4DEE4;
+  --font-display:"Instrument Serif",Georgia,serif;
+  --font-body:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#141B18; --surface:#1D2622; --fg:#E8EEEA; --muted:#9AA8A1; --line:#2E3A35;
+    --accent:#E08AA2; --accent-fg:#2A0F18; --accent-soft:#3A2530; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#141B18; --surface:#1D2622; --fg:#E8EEEA; --muted:#9AA8A1; --line:#2E3A35;
+  --accent:#E08AA2; --accent-fg:#2A0F18; --accent-soft:#3A2530; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  background:var(--bg); color:var(--fg); font-family:var(--font-body); font-size:15px; line-height:1.5;
+  padding-block:28px 56px;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));
+  padding-right:max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+h1{font-family:var(--font-display);font-weight:400;font-size:44px;line-height:1;margin:0}
+h1 em{font-style:italic}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700;margin:0 0 10px}
+.lead{color:var(--muted);margin:12px 0 0;max-width:46ch}
+h2{font-size:12px;letter-spacing:.12em;text-transform:uppercase;margin:0 0 12px;color:var(--muted);font-weight:700;display:flex;gap:10px;align-items:baseline}
+h2 b{color:var(--accent);font-family:var(--font-display);font-size:20px;letter-spacing:0;font-weight:400}
+.step{min-width:0}
+.grp{font-size:12px;font-weight:700;color:var(--muted);margin:14px 0 8px}
+.grp:first-of-type{margin-top:0}
+.list{display:flex;flex-direction:column;gap:8px}
+.opt{
+  text-align:left;font:inherit;color:inherit;background:var(--surface);border:1px solid var(--line);
+  border-radius:12px;padding:12px 14px;cursor:pointer;display:flex;flex-direction:column;gap:4px;width:100%;
+}
+.opt .top{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+.opt strong{font-weight:600}
+.opt .price{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.opt .sub{color:var(--muted);font-size:13px}
+.opt ul{margin:6px 0 0;padding-left:18px;font-size:13px;color:var(--fg)}
+.opt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;min-width:0}
+.addons{margin-top:12px}
+.addons h3{font-size:13px;margin:0 0 4px;font-weight:700}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.row:first-of-type{border-top:0}
+.row span small{display:block;color:var(--muted);font-size:12px}
+.qty{display:flex;align-items:center;gap:10px;font-variant-numeric:tabular-nums}
+.qty button,.nav{font:inherit;color:inherit;background:none;border:1px solid var(--line);border-radius:10px;width:36px;height:36px;cursor:pointer}
+.qty button:disabled,.nav:disabled{opacity:.35;cursor:default}
+.calhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.calhead strong{font-weight:600;text-transform:capitalize}
+.grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;text-align:center}
+.dow{font-size:11px;color:var(--muted);font-weight:600;padding:4px 0}
+.day{font:inherit;color:inherit;background:none;border:0;border-radius:10px;aspect-ratio:1;min-height:38px;cursor:pointer;font-variant-numeric:tabular-nums}
+.day:disabled{color:var(--muted);opacity:.4;cursor:default}
+.day.today{box-shadow:inset 0 0 0 1px var(--line)}
+.day[aria-pressed="true"]{background:var(--accent);color:var(--accent-fg);font-weight:700}
+.times{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:8px}
+.chip{font:inherit;font-variant-numeric:tabular-nums;color:inherit;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 0;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-fg);font-weight:600}
+.chip.wide{padding:8px 14px}
+.hint{color:var(--muted);font-size:13px;margin:8px 0 0}
+.fields{display:flex;flex-direction:column;gap:12px}
+label{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600}
+input,textarea,select{
+  font:inherit;font-weight:400;color:var(--fg);background:var(--surface);border:1px solid var(--line);
+  border-radius:10px;padding:11px 12px;width:100%;
+}
+textarea{min-height:84px;resize:vertical}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.sum dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 14px}
+.sum dt{color:var(--muted)}
+.sum dd{margin:0;font-weight:600;min-width:0;overflow-wrap:anywhere}
+.sum .total{font-size:17px}
+.actions{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.btn{
+  display:block;text-align:center;text-decoration:none;font:inherit;font-weight:700;border-radius:12px;
+  padding:14px 16px;border:1px solid var(--accent);cursor:pointer;
+}
+.btn.primary{background:var(--accent);color:var(--accent-fg)}
+.btn.ghost{background:none;color:var(--accent)}
+.btn[aria-disabled="true"]{opacity:.4;pointer-events:none}
+.linkbtn{font:inherit;font-size:13px;background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;padding:6px;align-self:center}
+.note{color:var(--muted);font-size:13px;margin:12px 0 0}
+#status{min-height:20px;font-size:13px;color:var(--accent);font-weight:600;margin:6px 0 0;text-align:center}
+details.panel summary{cursor:pointer;font-weight:700}
+details.panel ul{margin:10px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted)}
+.contact{font-size:13px;color:var(--muted);text-align:center;margin:0}
+@media (prefers-reduced-motion:no-preference){.opt,.chip,.day,.btn{transition:background .15s,border-color .15s}}
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Wedding content creator</p>
+    <h1><em>Kayana</em> Creative.</h1>
+    <p class="lead">Pilih paket dan jadwal, lalu kirim detailnya lewat WhatsApp. Jadwalnya juga bisa ditambahkan ke Google Kalender.</p>
+  </header>
+
+  <section class="step">
+    <h2><b>1</b> Paket</h2>
+    <div id="packages"></div>
+    <div class="panel addons" id="addons" hidden>
+      <h3>Tambahan untuk paket wedding</h3>
+      <div class="row">
+        <span>Tambah crew<small>Rp300.000 per 8 jam</small></span>
+        <button class="chip wide" id="crew" type="button" aria-pressed="false">Tambah</button>
+      </div>
+      <div class="row">
+        <span>Edit video tambahan<small>Rp50.000 per video</small></span>
+        <div class="qty"><button type="button" data-k="edit" data-d="-1" aria-label="Kurangi video">&minus;</button><b id="q-edit">0</b><button type="button" data-k="edit" data-d="1" aria-label="Tambah video">+</button></div>
+      </div>
+      <div class="row">
+        <span>Extra time<small>Rp100.000 per jam</small></span>
+        <div class="qty"><button type="button" data-k="extra" data-d="-1" aria-label="Kurangi jam">&minus;</button><b id="q-extra">0</b><button type="button" data-k="extra" data-d="1" aria-label="Tambah jam">+</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="step">
+    <h2><b>2</b> Tanggal</h2>
+    <div class="panel">
+      <div class="calhead">
+        <button class="nav" id="prev" aria-label="Bulan sebelumnya" type="button">&#8249;</button>
+        <strong id="monthLabel"></strong>
+        <button class="nav" id="next" aria-label="Bulan berikutnya" type="button">&#8250;</button>
+      </div>
+      <div class="grid" id="cal"></div>
+    </div>
+  </section>
+
+  <section class="step">
+    <h2><b>3</b> <span id="timeTitle">Jam mulai</span></h2>
+    <div class="times" id="times"></div>
+    <div id="durBox" hidden style="margin-top:12px">
+      <label for="dur">Perkiraan durasi acara
+        <select id="dur"></select>
+      </label>
+    </div>
+    <p class="hint" id="timeHint">Semua jam memakai waktu Indonesia Barat (WIB).</p>
+  </section>
+
+  <section class="step">
+    <h2><b>4</b> Data Anda</h2>
+    <div class="fields">
+      <label for="name">Nama lengkap
+        <input id="name" autocomplete="name" placeholder="Contoh: Rina dan Bayu">
+      </label>
+      <label for="phone">Nomor WhatsApp Anda
+        <input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="08xxxxxxxxxx">
+      </label>
+      <label for="venue">Lokasi acara
+        <input id="venue" placeholder="Nama gedung atau kota">
+      </label>
+      <label for="notes">Catatan
+        <textarea id="notes" placeholder="Tema, jumlah tamu, atau hal yang ingin ditanyakan"></textarea>
+      </label>
+    </div>
+    <p class="hint">Transport gratis sampai radius 5 km. Lebih dari itu dihitung sesuai jarak ke lokasi.</p>
+  </section>
+
+  <section class="step">
+    <h2>Ringkasan</h2>
+    <div class="panel sum">
+      <dl id="summary"></dl>
+      <div class="actions">
+        <a class="btn primary" id="wa" role="button" target="_blank" rel="noopener">Kirim lewat WhatsApp</a>
+        <a class="btn ghost" id="gcal" role="button" target="_blank" rel="noopener">Tambah ke Google Kalender</a>
+        <button class="linkbtn" id="copy" type="button">Salin pesan booking</button>
+      </div>
+      <p id="status" aria-live="polite"></p>
+      <p class="note">Tombol WhatsApp membuka chat dengan pesan yang sudah terisi. Tanggal terkunci setelah DP minimal Rp50.000 dan kami konfirmasi lewat WhatsApp.</p>
+    </div>
+  </section>
+
+  <details class="panel">
+    <summary>Ketentuan singkat</summary>
+    <ul>
+      <li>DP minimal Rp50.000 untuk mengamankan tanggal. Pelunasan maksimal H-2 sebelum acara.</li>
+      <li>Perubahan jadwal maksimal H-7, dengan syarat tanggal baru masih tersedia. Jika tanggal baru tidak tersedia dan klien membatalkan, DP hangus.</li>
+      <li>Semua video diambil dengan iPhone (minimal 13, tidak bisa request device). Klien boleh memakai device sendiri dengan ruang penyimpanan yang cukup.</li>
+      <li>Fokus pada momen natural, candid, dan behind the scenes. Layanan ini bukan pengganti videografer utama.</li>
+      <li>Karena hanya melibatkan 1 crew, mohon tidak berekspektasi terlalu tinggi untuk dokumentasi yang menyeluruh.</li>
+      <li>Raw footage dikirim lewat Google Drive maksimal 2x24 jam setelah acara. Video highlight wedding maksimal 3x24 jam.</li>
+      <li>Acara yang melebihi durasi paket dikenakan biaya overtime.</li>
+      <li>Kayana Creative berhak memakai hasil dokumentasi untuk portofolio dan promosi.</li>
+    </ul>
+  </details>
+
+  <p class="contact">WhatsApp <span id="waShow"></span></p>
+</div>
+
+<script>
+const CONFIG = { waNumber: "6287877948826", waShow: "0878-7794-8826", tz: "Asia/Jakarta" };
+const PRICE = { crew: 300000, edit: 50000, extra: 100000 };
+
+const PACKAGES = [
+  { id: "silver", group: "Wedding", kind: "wedding", name: "Wedding Silver", price: 350000,
+    summary: "Standby akad atau resepsi, 1 video reels/TikTok",
+    features: ["Standby akad atau resepsi", "Sampai 4 story Instagram", "1 video reels/TikTok", "Editing same day", "Semua file lewat Google Drive"] },
+  { id: "gold", group: "Wedding", kind: "wedding", name: "Wedding Gold", price: 500000,
+    summary: "Standby akad dan resepsi, plus take over Instagram",
+    features: ["Standby akad dan resepsi", "7-10 story Instagram", "1 video reels/TikTok", "1 content trend (sesuai request)", "Editing same day", "Semua file lewat Google Drive", "Take over Instagram"] },
+  { id: "platinum", group: "Wedding", kind: "wedding", name: "Wedding Platinum", price: 550000,
+    summary: "Standby akad dan resepsi, 2 content trend",
+    features: ["Standby akad dan resepsi", "10-15 story Instagram", "1 video reels/TikTok", "2 content trend (sesuai request)", "Editing same day", "Semua file lewat Google Drive", "Take over Instagram"] },
+  { id: "prewed", group: "Pra-wedding dan event", kind: "other", hours: 3, name: "Pra-wedding", price: 300000,
+    summary: "Engagement, siraman, pengajian, sangjit, prewedding",
+    features: ["1 content creator, 3 jam coverage", "Unlimited raw (iPhone)", "Sampai 4 story Instagram", "Edit same day, 1 recap", "1 video trend (sesuai request)", "Drive dikirim maksimal H+2, aktif 1 bulan", "Overtime Rp50.000"] },
+  { id: "event", group: "Pra-wedding dan event", kind: "other", hours: 3, name: "Event personal", price: 250000,
+    summary: "Ulang tahun, wisuda, dan acara lain",
+    features: ["1 content creator, 3 jam coverage", "Unlimited raw (iPhone)", "Edit same day, 2 recap (30 detik dan maksimal 1 menit)", "Drive dikirim maksimal H+2, aktif 1 bulan", "Overtime Rp50.000"] }
+];
+
+const state = { pkg: null, crew: false, edit: 0, extra: 0, date: null, time: null, dur: 4, y: 0, m: 0, msg: "" };
+const $ = (id) => document.getElementById(id);
+const pad = (n) => String(n).padStart(2, "0");
+const rp = (n) => "Rp" + n.toLocaleString("id-ID");
+const today = new Date(); today.setHours(0, 0, 0, 0);
+state.y = today.getFullYear(); state.m = today.getMonth();
+$("waShow").textContent = CONFIG.waShow;
+
+const cur = () => PACKAGES.find((p) => p.id === state.pkg);
+
+function renderPackages() {
+  const box = $("packages"); box.innerHTML = "";
+  let group = "";
+  let list = null;
+  PACKAGES.forEach((p) => {
+    if (p.group !== group) {
+      group = p.group;
+      const g = document.createElement("p"); g.className = "grp"; g.textContent = group; box.appendChild(g);
+      list = document.createElement("div"); list.className = "list"; box.appendChild(list);
+    }
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "opt";
+    const on = state.pkg === p.id;
+    b.setAttribute("aria-pressed", String(on));
+    const top = document.createElement("div"); top.className = "top";
+    const n = document.createElement("strong"); n.textContent = p.name;
+    const pr = document.createElement("span"); pr.className = "price"; pr.textContent = rp(p.price);
+    top.append(n, pr);
+    const sub = document.createElement("span"); sub.className = "sub"; sub.textContent = p.summary;
+    b.append(top, sub);
+    if (on) {
+      const ul = document.createElement("ul");
+      p.features.forEach((f) => { const li = document.createElement("li"); li.textContent = f; ul.appendChild(li); });
+      b.appendChild(ul);
+    }
+    b.onclick = () => { state.pkg = p.id; state.time = null; renderPackages(); renderAddons(); renderTimes(); update(); };
+    list.appendChild(b);
+  });
+}
+
+function renderAddons() {
+  const p = cur();
+  $("addons").hidden = !(p && p.kind === "wedding");
+  $("crew").setAttribute("aria-pressed", String(state.crew));
+  $("crew").textContent = state.crew ? "Ditambahkan" : "Tambah";
+  $("q-edit").textContent = state.edit; $("q-extra").textContent = state.extra;
+}
+
+function renderCal() {
+  const cal = $("cal"); cal.innerHTML = "";
+  ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"].forEach((d) => {
+    const e = document.createElement("div"); e.className = "dow"; e.textContent = d; cal.appendChild(e);
+  });
+  const first = new Date(state.y, state.m, 1);
+  $("monthLabel").textContent = first.toLocaleDateString("id-ID", { month: "long", year: "numeric" });
+  const lead = (first.getDay() + 6) % 7;
+  for (let i = 0; i < lead; i++) cal.appendChild(document.createElement("div"));
+  const days = new Date(state.y, state.m + 1, 0).getDate();
+  for (let d = 1; d <= days; d++) {
+    const dt = new Date(state.y, state.m, d);
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "day"; b.textContent = d;
+    if (dt.getTime() === today.getTime()) b.classList.add("today");
+    b.disabled = dt < today;
+    const sel = state.date && state.date.getTime() === dt.getTime();
+    b.setAttribute("aria-pressed", String(!!sel));
+    b.onclick = () => { state.date = dt; renderCal(); update(); };
+    cal.appendChild(b);
+  }
+  $("prev").disabled = state.y === today.getFullYear() && state.m === today.getMonth();
+}
+
+function renderTimes() {
+  const box = $("times"); box.innerHTML = "";
+  const p = cur();
+  $("durBox").hidden = !(p && p.kind === "wedding");
+  if (!p) { $("timeHint").textContent = "Pilih paket dulu, lalu pilih jam mulai."; return; }
+  $("timeHint").textContent = p.kind === "wedding"
+    ? "Semua jam memakai WIB. Durasi hanya perkiraan untuk jadwal. Kelebihan waktu bisa ditambah lewat extra time."
+    : "Semua jam memakai WIB. Coverage berlangsung " + p.hours + " jam.";
+  for (let h = 5; h <= 21; h++) {
+    const t = pad(h) + ":00";
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "chip"; b.textContent = t;
+    b.setAttribute("aria-pressed", String(state.time === t));
+    b.onclick = () => { state.time = t; renderTimes(); update(); };
+    box.appendChild(b);
+  }
+}
+
+function dur() { const p = cur(); return p.kind === "wedding" ? state.dur : p.hours; }
+
+function shift(date, hhmm, addMins) {
+  const [h, m] = hhmm.split(":").map(Number);
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate(), h, m + (addMins || 0));
+}
+function stamp(d) {
+  return d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + "T" + pad(d.getHours()) + pad(d.getMinutes()) + "00";
+}
+function hm(d) { return pad(d.getHours()) + ":" + pad(d.getMinutes()); }
+
+function addonLines() {
+  const out = [];
+  if (state.crew) out.push("Tambah crew (8 jam)");
+  if (state.edit > 0) out.push(state.edit + " video edit tambahan");
+  if (state.extra > 0) out.push(state.extra + " jam extra time");
+  return out;
+}
+function total() {
+  const p = cur(); if (!p) return 0;
+  let t = p.price;
+  if (p.kind === "wedding") t += (state.crew ? PRICE.crew : 0) + state.edit * PRICE.edit + state.extra * PRICE.extra;
+  return t;
+}
+
+function update() {
+  const p = cur();
+  const name = $("name").value.trim(), phone = $("phone").value.trim(), venue = $("venue").value.trim(), notes = $("notes").value.trim();
+  const dateText = state.date ? state.date.toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" }) : "";
+  let timeText = "Belum dipilih", start = null, end = null;
+  if (p && state.date && state.time) {
+    start = shift(state.date, state.time); end = shift(state.date, state.time, dur() * 60);
+    timeText = hm(start) + " - " + hm(end) + " WIB";
+  } else if (state.time) timeText = state.time + " WIB";
+  const adds = p && p.kind === "wedding" ? addonLines() : [];
+
+  const rows = [["Paket", p ? p.name + " (" + rp(p.price) + ")" : "Belum dipilih"]];
+  if (adds.length) rows.push(["Tambahan", adds.join(", ")]);
+  rows.push(["Tanggal", dateText || "Belum dipilih"], ["Jam", timeText], ["Nama", name || "Belum diisi"]);
+  if (venue) rows.push(["Lokasi", venue]);
+  const dl = $("summary"); dl.innerHTML = "";
+  rows.forEach(([k, v]) => {
+    const dt = document.createElement("dt"), dd = document.createElement("dd");
+    dt.textContent = k; dd.textContent = v; dl.append(dt, dd);
+  });
+  if (p) {
+    const dt = document.createElement("dt"), dd = document.createElement("dd");
+    dt.textContent = "Perkiraan total"; dd.className = "total"; dd.textContent = rp(total()) + " (belum termasuk transport)";
+    dl.append(dt, dd);
+  }
+
+  const ready = p && state.date && state.time && name;
+  const wa = $("wa"), gc = $("gcal");
+  if (!ready) {
+    [wa, gc].forEach((a) => { a.removeAttribute("href"); a.setAttribute("aria-disabled", "true"); });
+    $("copy").disabled = true; state.msg = "";
+    return;
+  }
+  const detailLines = [
+    "Paket: " + p.name + " (" + rp(p.price) + ")",
+    adds.length ? "Tambahan: " + adds.join(", ") : "",
+    "Perkiraan total: " + rp(total()) + " (belum termasuk transport)",
+    phone ? "WhatsApp klien: " + phone : "",
+    venue ? "Lokasi: " + venue : "",
+    notes ? "Catatan: " + notes : ""
+  ].filter(Boolean).join("\n");
+  const gUrl = "https://calendar.google.com/calendar/render?action=TEMPLATE"
+    + "&text=" + encodeURIComponent("Kayana - " + p.name + " - " + name)
+    + "&dates=" + stamp(start) + "/" + stamp(end)
+    + "&ctz=" + encodeURIComponent(CONFIG.tz)
+    + "&details=" + encodeURIComponent(detailLines)
+    + (venue ? "&location=" + encodeURIComponent(venue) : "");
+  const msg = "Halo Kayana Creative, saya ingin booking.\n\n"
+    + "Paket: " + p.name + " (" + rp(p.price) + ")\n"
+    + (adds.length ? "Tambahan: " + adds.join(", ") + "\n" : "")
+    + "Perkiraan total: " + rp(total()) + " (belum termasuk transport)\n"
+    + "Tanggal: " + dateText + "\n"
+    + "Jam: " + timeText + "\n"
+    + "Nama: " + name + "\n"
+    + (phone ? "WhatsApp: " + phone + "\n" : "")
+    + (venue ? "Lokasi: " + venue + "\n" : "")
+    + (notes ? "Catatan: " + notes + "\n" : "")
+    + "\nTambah ke kalender: " + gUrl;
+  state.msg = msg;
+  gc.href = gUrl; gc.removeAttribute("aria-disabled");
+  wa.href = "https://wa.me/" + CONFIG.waNumber + "?text=" + encodeURIComponent(msg);
+  wa.removeAttribute("aria-disabled");
+  $("copy").disabled = false;
+}
+
+$("copy").addEventListener("click", () => {
+  const st = $("status");
+  if (!state.msg) return;
+  try {
+    navigator.clipboard.writeText(state.msg).then(
+      () => { st.textContent = "Pesan disalin. Tempel di chat WhatsApp " + CONFIG.waShow + "."; },
+      () => { st.textContent = "Pesan belum bisa disalin. Gunakan tombol WhatsApp."; }
+    );
+  } catch (e) { st.textContent = "Pesan belum bisa disalin. Gunakan tombol WhatsApp."; }
+});
+
+document.querySelectorAll(".qty button").forEach((b) => {
+  b.onclick = () => {
+    const k = b.dataset.k, d = Number(b.dataset.d);
+    state[k] = Math.max(0, Math.min(12, state[k] + d));
+    renderAddons(); update();
+  };
+});
+$("crew").onclick = () => { state.crew = !state.crew; renderAddons(); update(); };
+
+const dsel = $("dur");
+for (let h = 3; h <= 12; h++) { const o = document.createElement("option"); o.value = h; o.textContent = h + " jam"; dsel.appendChild(o); }
+dsel.value = String(state.dur);
+dsel.onchange = () => { state.dur = Number(dsel.value); update(); };
+
+$("prev").onclick = () => { state.m--; if (state.m < 0) { state.m = 11; state.y--; } renderCal(); };
+$("next").onclick = () => { state.m++; if (state.m > 11) { state.m = 0; state.y++; } renderCal(); };
+["name", "phone", "venue", "notes"].forEach((id) => $(id).addEventListener("input", update));
+
+renderPackages(); renderAddons(); renderCal(); renderTimes(); update();
+</script>
+
+</body></html>
